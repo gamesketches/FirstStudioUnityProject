@@ -24,6 +24,7 @@ public class GameLogic : MonoBehaviour {
 	public int largeEnemySpawnCount = 10;
 	public float largeEnemyScale = 1.0f;
 	public float largeEnemySpawnDistance = 20.0f;
+	int curMode = 0;
 
 	// Use this for initialization
 	void Start () {
@@ -111,6 +112,23 @@ public class GameLogic : MonoBehaviour {
 
 	//this function is called when an enemy touches the ring and sends a message to call this function
 	public void EnemyTouch(GameObject sender){
+		if(sender.transform.localScale.x > 1.0f) {
+			switch(curMode) {
+			case 0:
+				ring.GetComponent<SpriteRenderer>().sprite = 
+					Resources.Load("WhiteTriangle", typeof(Sprite)) as Sprite;
+				curMode = 1;
+				break;
+			case 1:
+				ring.GetComponent<SpriteRenderer>().sprite = 
+					Resources.Load("WhiteSquare", typeof(Sprite)) as Sprite;
+				break;
+			case 2:
+				ring.GetComponent<SpriteRenderer>().sprite = 
+					Resources.Load("WhiteRing", typeof(Sprite)) as Sprite;
+				break;
+			}
+		}
 		//they say 'don't kill the messenger' but in this case we have to
 		Destroy(sender);
 
@@ -118,9 +136,6 @@ public class GameLogic : MonoBehaviour {
 		
 		//give the ring a little reaction when it gets hit, by increasing its size
 		ring.transform.localScale = new Vector3(1.05f,1.05f,1f); 
-
-		ring.GetComponent<SpriteRenderer>().sprite = 
-			Resources.Load("WhiteTriangle", typeof(Sprite)) as Sprite;
 
 	}
 
