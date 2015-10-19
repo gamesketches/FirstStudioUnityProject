@@ -24,7 +24,10 @@ public class GameLogic : MonoBehaviour {
 	public int largeEnemySpawnCount = 10;
 	public float largeEnemyScale = 1.0f;
 	public float largeEnemySpawnDistance = 20.0f;
+	public float startingScale = 1.0f;
+	public float scaleDecay = 0.2f;
 	int curMode = 0;
+	float scaleLevel;
 
 	// Use this for initialization
 	void Start () {
@@ -63,7 +66,7 @@ public class GameLogic : MonoBehaviour {
 		}
 
 		//if the ring is larger than normal, animate it back
-		if (ring.transform.localScale.x > 1f) {
+		if (ring.transform.localScale.x > scaleLevel) {
 			//we can't change the transform x,y or z direct, so we make a copy
 			Vector3 newScale = ring.transform.localScale;
 			newScale.x /= 1.01f;
@@ -91,6 +94,9 @@ public class GameLogic : MonoBehaviour {
 
 		ring.GetComponent<SpriteRenderer>().sprite = 
 			Resources.Load("WhiteRing", typeof(Sprite)) as Sprite;
+
+		ring.transform.localScale += new Vector3(startingScale, startingScale, 0);
+		scaleLevel = ring.transform.localScale.x;
 		
 		//Put the player and ring back in the center of the world
 		PlayerControl playerControl = player.GetComponent<PlayerControl>();
@@ -134,6 +140,7 @@ public class GameLogic : MonoBehaviour {
 				curMode = 0;
 				break;
 			}
+			ring.transform.localScale -= new Vector3(scaleDecay, scaleDecay, 0);
 		}
 		//they say 'don't kill the messenger' but in this case we have to
 		Destroy(sender);
@@ -141,7 +148,7 @@ public class GameLogic : MonoBehaviour {
 		score += 1;
 		
 		//give the ring a little reaction when it gets hit, by increasing its size
-		ring.transform.localScale = new Vector3(1.05f,1.05f,1f); 
+		ring.transform.localScale += new Vector3(.05f,.05f,0); 
 
 	}
 
