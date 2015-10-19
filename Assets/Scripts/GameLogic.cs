@@ -20,6 +20,10 @@ public class GameLogic : MonoBehaviour {
 
 	float timeSinceLastEnemyCreated = 0;
 	float enemySpawnDelay = 0;
+	int enemySpawnCount = 0;
+	public int largeEnemySpawnCount = 10;
+	public float largeEnemyScale = 1.0f;
+	public float largeEnemySpawnDistance = 20.0f;
 
 	// Use this for initialization
 	void Start () {
@@ -41,22 +45,17 @@ public class GameLogic : MonoBehaviour {
 				//we want to create the enemy at a fixed distance from the player
 				float enemySpawnDistance = 11.0f; 
 
-				//and at a random angle to the player (in Radians rather than degree)
-				float enemySpawnAngle = Random.Range(-Mathf.PI, Mathf.PI);
+				Vector3 enemyScale = new Vector3(0.0f, 0.0f);
 
-				//start by getting the ring position and then add an offset from the random angle
-				Vector2 newEnemyPosition = ring.transform.position; //we'll use the ring as the center
+				newEnemy(enemySpawnDistance, enemyScale);
 
-				//Again, if your trig is rusty, don't worry about this. We'll talk about it in Code Lab 0
-				newEnemyPosition.x += enemySpawnDistance * Mathf.Cos(enemySpawnAngle);
-				newEnemyPosition.y += enemySpawnDistance * Mathf.Sin(enemySpawnAngle);
+				if(enemySpawnCount > largeEnemySpawnCount){ 
+					enemyScale = new Vector3(largeEnemyScale, largeEnemyScale);
 
-				//Make a new enemy from a Prefab
-				GameObject newEnemy = Instantiate(enemyPrefab,newEnemyPosition,Quaternion.identity) as GameObject;
-				newEnemy.transform.parent = enemyContainer;
+					newEnemy(largeEnemySpawnDistance, enemyScale);
 
-				timeSinceLastEnemyCreated = 0; //reset the timer
-				enemySpawnDelay *= 0.97f; //get faster
+					enemySpawnCount = 0;
+				}
 			}
 		} else {
 			scoreText.text = "click dot";
@@ -120,4 +119,25 @@ public class GameLogic : MonoBehaviour {
 		//give the ring a little reaction when it gets hit, by increasing its size
 		ring.transform.localScale = new Vector3(1.05f,1.05f,1f); 
 	}
+
+	public void newEnemy(float spawnDistance, Vector3 scale){
+			//and at a random angle to the player (in Radians rather than degree)
+			float enemySpawnAngle = Random.Range(-Mathf.PI, Mathf.PI);
+			
+			//start by getting the ring position and then add an offset from the random angle
+			Vector2 newEnemyPosition = ring.transform.position; //we'll use the ring as the center
+			
+			//Again, if your trig is rusty, don't worry about this. We'll talk about it in Code Lab 0
+			newEnemyPosition.x += spawnDistance * Mathf.Cos(enemySpawnAngle);
+			newEnemyPosition.y += spawnDistance * Mathf.Sin(enemySpawnAngle);
+			
+			//Make a new enemy from a Prefab
+			GameObject newEnemy = Instantiate(enemyPrefab,newEnemyPosition,Quaternion.identity) as GameObject;
+			newEnemy.transform.parent = enemyContainer;
+			newEnemy.transform.localScale += scale;
+			
+			timeSinceLastEnemyCreated = 0; //reset the timer
+			enemySpawnDelay *= 0.97f; //get faster
+			enemySpawnCount += 1;
+		}
 }
