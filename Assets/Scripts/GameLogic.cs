@@ -118,6 +118,10 @@ public class GameLogic : MonoBehaviour {
 		
 		//give the ring a little reaction when it gets hit, by increasing its size
 		ring.transform.localScale = new Vector3(1.05f,1.05f,1f); 
+
+		ring.GetComponent<SpriteRenderer>().sprite = 
+			Resources.Load("WhiteTriangle", typeof(Sprite)) as Sprite;
+
 	}
 
 	public void newEnemy(float spawnDistance, Vector3 scale){
