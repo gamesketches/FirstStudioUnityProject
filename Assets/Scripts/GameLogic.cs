@@ -89,6 +89,9 @@ public class GameLogic : MonoBehaviour {
 		  	Destroy(enemy.gameObject);
 		}
 
+		ring.GetComponent<SpriteRenderer>().sprite = 
+			Resources.Load("WhiteRing", typeof(Sprite)) as Sprite;
+		
 		//Put the player and ring back in the center of the world
 		PlayerControl playerControl = player.GetComponent<PlayerControl>();
 		playerControl.Reset();
@@ -103,6 +106,7 @@ public class GameLogic : MonoBehaviour {
 		}
 
 		score = 0;
+		curMode = 0;
 		timeSinceLastEnemyCreated = 0f;
 		enemySpawnDelay = 0.5f;
 
@@ -122,10 +126,12 @@ public class GameLogic : MonoBehaviour {
 			case 1:
 				ring.GetComponent<SpriteRenderer>().sprite = 
 					Resources.Load("WhiteSquare", typeof(Sprite)) as Sprite;
+				curMode = 2;
 				break;
 			case 2:
 				ring.GetComponent<SpriteRenderer>().sprite = 
 					Resources.Load("WhiteRing", typeof(Sprite)) as Sprite;
+				curMode = 0;
 				break;
 			}
 		}
