@@ -57,13 +57,6 @@ public class PlayerControl : MonoBehaviour {
 
 			WarnPlayer(); //call the "WarnPlayer" script on 103
 
-			//let's see if we're too close to the ring, and end the game if so.
-			if (CheckForRingCollision()) {
-				Debug.Log("HIT THE RING!");
-				dangerAudio.volume = 0;
-				GameLogic gameLogic = game.GetComponent<GameLogic>(); //get the GameLogic component from the game GameObject
-				gameLogic.Reset(); //Call the "Reset" function on line 82 of the GameLogic script
-			}
 		}
 
 	}
@@ -80,9 +73,9 @@ public class PlayerControl : MonoBehaviour {
 		gameStarted = false;
 	}
 
-	bool CheckForRingCollision(){
+	//bool CheckForRingCollision(){
 
-		//measure the distance between the player and the ring
+/*		//measure the distance between the player and the ring
 		//if it's above a certain value we know we're touching the ring
 
 		Vector3 thisPosition = transform.position;
@@ -96,7 +89,16 @@ public class PlayerControl : MonoBehaviour {
 			return true;
 		} else {
 			return false;
-		}
+		}*/
+
+	//}
+
+	//Automatically called by Unity on a collision of 2D Colliders
+	void OnCollisionEnter2D (Collision2D thisCollision){
+		Debug.Log("HIT THE RING!");
+		dangerAudio.volume = 0;
+		GameLogic gameLogic = game.GetComponent<GameLogic>(); //get the GameLogic component from the game GameObject
+		gameLogic.Reset(); //Call the "Reset" function on line 82 of the GameLogic script	
 	}
 
 	void WarnPlayer(){ //juice for letting the player know they are in danger

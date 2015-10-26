@@ -107,6 +107,10 @@ public class GameLogic : MonoBehaviour {
 		Rigidbody2D ringBody = ring.GetComponent<Rigidbody2D>();
 		ringBody.velocity = Vector2.zero;
 
+		// Switch the collider back to a circle
+		Destroy(ring.GetComponent<PolygonCollider2D>());
+		ring.AddComponent<PolygonCollider2D>();
+
 		if (score > highscore){
 			highscore = score; //store high score
 		}
@@ -141,6 +145,8 @@ public class GameLogic : MonoBehaviour {
 				break;
 			}
 			ring.transform.localScale -= new Vector3(scaleDecay, scaleDecay, 0);
+			Destroy(ring.GetComponent<PolygonCollider2D>());
+			ring.AddComponent<PolygonCollider2D>();
 		}
 		//they say 'don't kill the messenger' but in this case we have to
 		Destroy(sender);
