@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI; //this allows us to address the text object
+using UnityEditor;
 
 public class GameLogic : MonoBehaviour {
 
@@ -10,7 +11,8 @@ public class GameLogic : MonoBehaviour {
 	public GameObject ring;
 	int score;
 	int highscore;
-	bool gameStarted ;
+	bool gameStarted;
+	bool frozen=false;
 
 	public Text scoreText;
 	public Text highScoreText;
@@ -24,8 +26,8 @@ public class GameLogic : MonoBehaviour {
 	public int largeEnemySpawnCount = 10;
 	public float largeEnemyScale = 1.0f;
 	public float largeEnemySpawnDistance = 20.0f;
-	public float startingScale = 1.0f;
-	public float scaleDecay = 0.2f;
+	public float startingScale = 2.0f;
+	public float scaleDecay = -0.5f;
 	int curMode = 0;
 	float scaleLevel;
 
@@ -40,7 +42,7 @@ public class GameLogic : MonoBehaviour {
 
 		highScoreText.text = "" + highscore;  //set the high score text
 
-		if (gameStarted){
+		if (gameStarted && !frozen){
 			scoreText.text = "" + score;
 
 			timeSinceLastEnemyCreated += Time.deltaTime; //increase this timer by the time since the last frame
@@ -61,10 +63,10 @@ public class GameLogic : MonoBehaviour {
 					enemySpawnCount = 0;
 				}
 			}
-		} else {
+
+		} else if(!gameStarted && !frozen) {
 			scoreText.text = "click dot";
 		}
-
 		//if the ring is larger than normal, animate it back
 		if (ring.transform.localScale.x > scaleLevel) {
 			//we can't change the transform x,y or z direct, so we make a copy
@@ -76,15 +78,25 @@ public class GameLogic : MonoBehaviour {
 			ring.transform.localScale = newScale;
 		}
 	}
-
+	
 	//function is called by PlayerControl when the circle is clicked.
 	public void StartGame(){
 		gameStarted = true;
 	}
 
+	public void freeze() {
+		for(int i = 0; i < enemyContainer.childCount; i++) {
+			Transform enemy = enemyContainer.GetChild(i);
+			Destroy(enemy.gameObject);
+		}
+		frozen = true;
+	}
+
 	public void Reset() { //Tell the game manager to reset everything
 
+		//Debug.Break ();
 		gameStarted = false;
+		frozen = false;
 
 		//Kill any living enemies
 		for(int i = 0; i < enemyContainer.childCount; i++){
@@ -95,6 +107,7 @@ public class GameLogic : MonoBehaviour {
 		ring.GetComponent<SpriteRenderer>().sprite = 
 			Resources.Load("WhiteRing", typeof(Sprite)) as Sprite;
 
+		print(ring.transform.localScale);
 		ring.transform.localScale += new Vector3(startingScale, startingScale, 0);
 		scaleLevel = ring.transform.localScale.x;
 		
@@ -131,7 +144,7 @@ public class GameLogic : MonoBehaviour {
 			case 0:
 				ring.GetComponent<SpriteRenderer>().sprite = 
 					Resources.Load("WhiteTriangle", typeof(Sprite)) as Sprite;
-				curMode = 1;
+				curMode = 2;
 				break;
 			case 1:
 				ring.GetComponent<SpriteRenderer>().sprite = 
@@ -144,9 +157,14 @@ public class GameLogic : MonoBehaviour {
 				curMode = 0;
 				break;
 			}
+			print(ring.transform.localScale);
 			ring.transform.localScale -= new Vector3(scaleDecay, scaleDecay, 0);
+			scaleLevel = ring.transform.localScale.x;
+			print("Changed shape");
+			print(ring.transform.localScale);
 			Destroy(ring.GetComponent<PolygonCollider2D>());
 			ring.AddComponent<PolygonCollider2D>();
+			//EditorApplication.isPaused = true;
 		}
 		//they say 'don't kill the messenger' but in this case we have to
 		Destroy(sender);

@@ -13,6 +13,8 @@ public class EnemyControl : MonoBehaviour {
 	float moveDelay = 0.5f; //wait 0.5 seconds before moving
 	bool hasPlayedSound;
 
+	bool frozen = false;
+
 	// Use this for initialization
 	void Start () {
 		//we can't set the reference to ring in the inspector, because this is a prefab and it doesn't exist
@@ -28,6 +30,7 @@ public class EnemyControl : MonoBehaviour {
 	void Update () {
 		
 		//we want this enemy to move toward the ring
+		if(!frozen) {
 
 		//transform.position is a Vector3 but we don't need its z coordinate so we convert it
 		Vector2 ringPosition = ring.transform.position; 
@@ -62,6 +65,7 @@ public class EnemyControl : MonoBehaviour {
 				hasPlayedSound = true;
 			}
 		}
+	}
 	}
 
 	//Automatically called by Unity on a collision of 2D Colliders

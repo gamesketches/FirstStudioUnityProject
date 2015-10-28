@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEditor;
 
 public class PlayerControl : MonoBehaviour {
 
@@ -11,12 +12,14 @@ public class PlayerControl : MonoBehaviour {
 	//these variables are not public thus won't show up in the inspector or be accessible to other classes
 	GameObject game;
 	bool gameStarted;
+	bool frozen=false;
 	
 	public float playerSpeed;
 	public float thisRadius = 0.84f;
 	public float ringRadius = 2.56f;
 
 	public AudioSource dangerAudio;
+	public AudioSource gameOverAudio;
 
 	SpriteRenderer sprite;
 
@@ -53,8 +56,9 @@ public class PlayerControl : MonoBehaviour {
 			float distanceToMouse = vectorToMouse.magnitude;
 			
 			//now just move toward the mouse at a speed controlled by playerSpeed and the distance to the Mouse
-			transform.position = thisPosition + directionToMouse * playerSpeed * distanceToMouse;
-
+			if(!frozen){
+			    transform.position = thisPosition + directionToMouse * playerSpeed * distanceToMouse;
+			}
 			WarnPlayer(); //call the "WarnPlayer" script on 103
 
 		}
@@ -63,43 +67,32 @@ public class PlayerControl : MonoBehaviour {
 
 	//OnMouseDown is a built-in function that gets called when this gameobject is clicked
 	void OnMouseDown(){
-		gameStarted = true;
 		GameLogic gameLogic = game.GetComponent<GameLogic>(); //get the GameLogic component from the game GameObject
-		gameLogic.StartGame(); //Call the "StartGame" function on line 78 of the GameLogic script
+		if(frozen) {
+		gameLogic.Reset(); //Call the "StartGame" function on line 78 of the GameLogic script
+		frozen = false;
+		}
+		else {
+		gameLogic.StartGame();
+			gameStarted = true;
+		}
 	}
 
 	public void Reset(){
 		transform.position = Vector3.zero; //Vector3.zero is a shortcut for "new Vector3(0,0,0);"
 		gameStarted = false;
 	}
-
-	//bool CheckForRingCollision(){
-
-/*		//measure the distance between the player and the ring
-		//if it's above a certain value we know we're touching the ring
-
-		Vector3 thisPosition = transform.position;
-		Vector3 ringPosition = ring.position;
-		Vector3 vectorToRing = thisPosition - ringPosition;
-		float distanceToRingCenter = vectorToRing.magnitude;
-
-		//we must be touching the ring if the distance is larger than the difference in the radius
-		//between the ring and the player.
-		if (distanceToRingCenter > (ringRadius - thisRadius)){
-			return true;
-		} else {
-			return false;
-		}*/
-
-	//}
-
+	
 	//Automatically called by Unity on a collision of 2D Colliders
 	void OnCollisionEnter2D (Collision2D thisCollision){
 		Debug.Log("HIT THE RING!");
 		dangerAudio.volume = 0;
 		GameLogic gameLogic = game.GetComponent<GameLogic>(); //get the GameLogic component from the game GameObject
-		gameLogic.Reset(); //Call the "Reset" function on line 82 of the GameLogic script	
-	}
+		gameLogic.freeze();
+		frozen = true;
+		gameStarted = false;
+		gameOverAudio.Play();
+		}
 
 	void WarnPlayer(){ //juice for letting the player know they are in danger
 		Vector3 thisPosition = transform.position;
